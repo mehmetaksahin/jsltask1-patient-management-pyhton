@@ -1,0 +1,117 @@
+# =============================================================================
+# SNOWFLAKE SPCS (Snowpark Container Services) SPEC DOSYASI
+# =============================================================================
+# Bu dosya, uygulamayı Snowflake Container Services üzerinde çalıştırmak için
+# gerekli konfigürasyonu tanımlar.
+#
+# Java Karşılaştırması:
+# --------------------
+# Java versiyonundaki patient-service-spec.yaml ile aynı yapıda,
+# sadece image adı Python versiyonuna göre güncellendi.
+# =============================================================================
+
+spec:
+  # ===========================================================================
+  # CONTAINER TANIMLARI
+  # ===========================================================================
+  containers:
+    # -------------------------------------------------------------------------
+    # POSTGRESQL CONTAINER
+    # -------------------------------------------------------------------------
+    # Lokal PostgreSQL veritabanı
+    - name: postgres
+      image: /poc_db/public/poc_repo/postgres:15-alpine
+      env:
+        POSTGRES_DB: patient_db
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres123
+      resources:
+        requests:
+          memory: 512M
+          cpu: 0.5
+        limits:
+          memory: 1G
+          cpu: 1
+      volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data
+
+    # -------------------------------------------------------------------------
+    # PATIENT API CONTAINER (PYTHON)
+    # -------------------------------------------------------------------------
+    # FastAPI uygulaması
+    - name: patient-api
+      # Python image - Java versiyonunda patient-management:latest idi
+      image: /poc_db/public/poc_repo/patient-management-python:latest
+      env:
+        # PostgreSQL bağlantı ayarları
+        # Snowflake SPCS'de container'lar localhost üzerinden haberleşir
+        POSTGRESQL_HOST: localhost
+        POSTGRESQL_PORT: "5432"
+        POSTGRESQL_DATABASE: patient_db
+        POSTGRESQL_USERNAME: postgres
+        POSTGRESQL_PASSWORD: postgres123
+
+        # Snowflake bağlantı ayarları
+        # Bu değerler Snowflake içinden erişim için
+        SNOWFLAKE_ACCOUNT: hjelvtk-ls62935
+        SNOWFLAKE_USER: mehmetjsl
+        SNOWFLAKE_PASSWORD: "{{secrets.snowflake_password}}"
+        SNOWFLAKE_DATABASE: POC_DB
+        SNOWFLAKE_SCHEMA: PUBLIC
+        SNOWFLAKE_WAREHOUSE: POC_WH
+
+        # Server ayarları
+        SERVER_HOST: "0.0.0.0"
+        SERVER_PORT: "8080"
+        DEBUG: "false"
+
+      resources:
+        requests:
+          memory: 256M
+          cpu: 0.25
+        limits:
+          memory: 512M
+          cpu: 0.5
+
+      # Health check - readiness probe
+      readinessProbe:
+        port: 8080
+        path: /actuator/health/readiness
+
+  # ===========================================================================
+  # ENDPOINTS (DIŞ ERİŞİM)
+  # ===========================================================================
+  endpoints:
+    - name: patient-api
+      port: 8080
+      public: true  # Dışarıdan erişilebilir
+
+  # ===========================================================================
+  # VOLUMES
+  # ===========================================================================
+  volumes:
+    - name: postgres-data
+      source: local
+
+# =============================================================================
+# DEPLOYMENT NOTLARI
+# =============================================================================
+# 1. Bu spec dosyasını kullanmadan önce:
+#    - Docker image'ı Snowflake registry'ye push edilmeli
+#    - Snowflake secret oluşturulmalı (snowflake_password için)
+#
+# 2. Service oluşturma:
+#    CREATE SERVICE patient_service
+#    IN COMPUTE POOL poc_pool
+#    FROM SPECIFICATION $$
+#    <bu dosyanın içeriği>
+#    $$;
+#
+# 3. Service durumunu kontrol:
+#    SHOW SERVICES;
+#    SELECT SYSTEM$GET_SERVICE_STATUS('patient_service');
+#
+# 4. Service endpoint'ini al:
+#    SHOW ENDPOINTS IN SERVICE patient_service;
+# =============================================================================

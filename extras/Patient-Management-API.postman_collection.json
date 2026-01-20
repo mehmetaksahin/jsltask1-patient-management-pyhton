@@ -1,0 +1,299 @@
+{
+	"info": {
+		"_postman_id": "b2c3d4e5-f6a7-8901-bcde-f23456789012",
+		"name": "Patient Management API (Python)",
+		"description": "REST API collection for Patient Management application - Python/FastAPI version\n\nEndpoints are identical to the Java version for compatibility.\n\nNote: Request body uses snake_case (disease_name) instead of camelCase (diseaseName)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Patients",
+			"item": [
+				{
+					"name": "Get All Patients",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/patients",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"patients"
+							]
+						},
+						"description": "Retrieve all patients from PostgreSQL database"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Patient by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/patients/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"patients",
+								"1"
+							]
+						},
+						"description": "Retrieve a specific patient by their ID from PostgreSQL"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Patient",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John\",\n    \"surname\": \"Doe\",\n    \"disease_name\": \"Hypertension\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/patients",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"patients"
+							]
+						},
+						"description": "Create a new patient record in PostgreSQL\n\nNote: Python version uses snake_case (disease_name) instead of camelCase (diseaseName)"
+					},
+					"response": []
+				}
+			],
+			"description": "Patient CRUD operations on PostgreSQL"
+		},
+		{
+			"name": "ETL Migration",
+			"item": [
+				{
+					"name": "Migrate from Snowflake to PostgreSQL",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/patients/migrate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"patients",
+								"migrate"
+							]
+						},
+						"description": "ETL Migration: Reads all patients from Snowflake TBL_PATIENT table, appends current timestamp to name, surname, and disease_name fields, then saves to PostgreSQL.\n\nExample transformation:\n- Input: 'William'\n- Output: 'William 2026-01-20 10:30:45'"
+					},
+					"response": []
+				}
+			],
+			"description": "ETL operations between Snowflake and PostgreSQL"
+		},
+		{
+			"name": "Health",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/actuator/health",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"actuator",
+								"health"
+							]
+						},
+						"description": "Check application health status including PostgreSQL and Snowflake connectivity"
+					},
+					"response": []
+				},
+				{
+					"name": "Application Info",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/actuator/info",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"actuator",
+								"info"
+							]
+						},
+						"description": "Get application information (name, version, framework)"
+					},
+					"response": []
+				},
+				{
+					"name": "Liveness Probe",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/actuator/health/liveness",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"actuator",
+								"health",
+								"liveness"
+							]
+						},
+						"description": "Kubernetes liveness probe - checks if application is alive"
+					},
+					"response": []
+				},
+				{
+					"name": "Readiness Probe",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/actuator/health/readiness",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"actuator",
+								"health",
+								"readiness"
+							]
+						},
+						"description": "Kubernetes readiness probe - checks if application can accept traffic"
+					},
+					"response": []
+				}
+			],
+			"description": "Health and monitoring endpoints (Actuator-like)"
+		},
+		{
+			"name": "Documentation",
+			"item": [
+				{
+					"name": "Swagger UI",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/docs",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"docs"
+							]
+						},
+						"description": "Interactive API documentation (Swagger UI) - FastAPI auto-generated"
+					},
+					"response": []
+				},
+				{
+					"name": "ReDoc",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/redoc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"redoc"
+							]
+						},
+						"description": "Alternative API documentation (ReDoc) - FastAPI auto-generated"
+					},
+					"response": []
+				},
+				{
+					"name": "OpenAPI JSON",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/openapi.json",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"openapi.json"
+							]
+						},
+						"description": "OpenAPI 3.0 specification in JSON format"
+					},
+					"response": []
+				}
+			],
+			"description": "API Documentation endpoints (FastAPI auto-generated)"
+		}
+	]
+}

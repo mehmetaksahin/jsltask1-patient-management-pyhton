@@ -1,0 +1,99 @@
+# =============================================================================
+# DOCKER COMPOSE - LOCAL DEVELOPMENT
+# =============================================================================
+# Bu dosya, lokal geliştirme ortamında uygulamayı çalıştırmak için kullanılır.
+#
+# Kullanım:
+# ---------
+#   # Başlat
+#   docker-compose -f extras/docker-compose-local.yml up -d
+#
+#   # Logları izle
+#   docker-compose -f extras/docker-compose-local.yml logs -f
+#
+#   # Durdur
+#   docker-compose -f extras/docker-compose-local.yml down
+#
+# Java Versiyonu ile Karşılaştırma:
+# --------------------------------
+# Aynı yapıda, sadece Java uygulaması yerine Python uygulaması çalışıyor.
+# =============================================================================
+
+version: '3.8'
+
+services:
+  # ===========================================================================
+  # POSTGRESQL DATABASE
+  # ===========================================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: jsl-postgres-python
+    environment:
+      POSTGRES_DB: patient_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      # Veri kalıcılığı için volume
+      - /Users/mehmetaksahin/memox/jsl/docker/python-pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - patient-network
+
+  # ===========================================================================
+  # PYTHON FASTAPI APPLICATION
+  # ===========================================================================
+  patient-api:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: jsl-patient-api-python
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # PostgreSQL bağlantı ayarları
+      POSTGRESQL_HOST: postgres
+      POSTGRESQL_PORT: 5432
+      POSTGRESQL_DATABASE: patient_db
+      POSTGRESQL_USERNAME: postgres
+      POSTGRESQL_PASSWORD: postgres
+
+      # Snowflake bağlantı ayarları (env'den veya buradan)
+      SNOWFLAKE_ACCOUNT: hjelvtk-ls62935
+      SNOWFLAKE_USER: mehmetjsl
+      # SNOWFLAKE_PASSWORD: .env dosyasından okunacak
+      SNOWFLAKE_DATABASE: POC_DB
+      SNOWFLAKE_SCHEMA: PUBLIC
+      SNOWFLAKE_WAREHOUSE: POC_WH
+
+      # Server ayarları
+      SERVER_HOST: "0.0.0.0"
+      SERVER_PORT: "8080"
+      DEBUG: "true"
+    ports:
+      - "8080:8080"
+    volumes:
+      # Development: Hot reload için kaynak kodu mount et
+      - ../app:/app/app:ro
+    networks:
+      - patient-network
+
+# =============================================================================
+# NETWORKS
+# =============================================================================
+networks:
+  patient-network:
+    driver: bridge
+
+# =============================================================================
+# VOLUMES
+# =============================================================================
+volumes:
+  postgres_data:
+    driver: local

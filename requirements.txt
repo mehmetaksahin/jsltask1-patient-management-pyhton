@@ -1,0 +1,65 @@
+# =============================================================================
+# PYTHON BAĞIMLILIKLARI (Java'daki pom.xml'e karşılık gelir)
+# =============================================================================
+# Kurulum: pip install -r requirements.txt
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# WEB FRAMEWORK
+# -----------------------------------------------------------------------------
+# FastAPI: Modern, hızlı web framework (Java'daki Spring Boot'a karşılık gelir)
+# - Otomatik API dokümantasyonu (Swagger UI)
+# - Async desteği
+# - Pydantic ile otomatik validasyon
+fastapi==0.109.2
+
+# Uvicorn: ASGI sunucusu (Java'daki Tomcat'e karşılık gelir)
+# - FastAPI uygulamasını çalıştırır
+# - [standard] ekstra bağımlılıkları içerir (watchfiles, websockets vb.)
+uvicorn[standard]==0.27.1
+
+# -----------------------------------------------------------------------------
+# DATABASE - ORM
+# -----------------------------------------------------------------------------
+# SQLAlchemy: Python ORM kütüphanesi (Java'daki Hibernate/JPA'ya karşılık gelir)
+# - Veritabanı tablolarını Python sınıfları olarak tanımlar
+# - SQL sorguları yazmadan veritabanı işlemleri yapılır
+sqlalchemy>=2.0.35
+
+# -----------------------------------------------------------------------------
+# DATABASE DRIVERS
+# -----------------------------------------------------------------------------
+# psycopg: PostgreSQL driver (Java'daki postgresql JDBC driver'a karşılık gelir)
+# - psycopg3: Modern, async destekli yeni nesil driver
+# - [binary]: Derlenmiş hali, kurulumu kolay (Python 3.13 uyumlu)
+# NOT: psycopg2-binary Python 3.13 ile uyumsuz, psycopg (v3) kullanıyoruz
+psycopg[binary]==3.2.3
+
+# snowflake-connector-python: Snowflake driver (Java'daki snowflake-jdbc'ye karşılık gelir)
+# - Snowflake veritabanına bağlanmak için gerekli
+snowflake-connector-python==3.6.0
+
+# -----------------------------------------------------------------------------
+# DATA VALIDATION
+# -----------------------------------------------------------------------------
+# Pydantic: Veri doğrulama kütüphanesi (Java'daki @Valid, @NotBlank'e karşılık gelir)
+# - Request/Response modellerini tanımlar
+# - Otomatik tip kontrolü ve validasyon
+# - pydantic-settings: Environment değişkenlerini okumak için
+pydantic>=2.10.0
+pydantic-settings>=2.6.0
+
+# -----------------------------------------------------------------------------
+# DATABASE MIGRATION
+# -----------------------------------------------------------------------------
+# Alembic: Veritabanı migration aracı (Java'daki Flyway'e karşılık gelir)
+# - Veritabanı şemasını versiyonlar
+# - Tablo oluşturma, güncelleme işlemlerini yönetir
+alembic==1.13.1
+
+# -----------------------------------------------------------------------------
+# UTILITIES
+# -----------------------------------------------------------------------------
+# python-dotenv: .env dosyasından environment değişkenlerini okur
+# - Java'daki application.yml'ın çevresel değişken kısmına karşılık gelir
+python-dotenv==1.0.1

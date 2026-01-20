@@ -1,0 +1,69 @@
+# 1. Dizine git
+cd jslexample-first-task-python
+
+# 2. .env dosyasını oluştur
+cp .env.example .env
+# Snowflake şifresini düzenle
+
+# 3. Sanal ortam oluştur
+python -m venv venv
+source venv/bin/activate
+
+# 4. Bağımlılıkları yükle
+pip install -r requirements.txt
+
+# 5. PostgreSQL başlat
+docker-compose -f extras/docker-compose-local.yml up -d postgres
+
+# 6. Uygulamayı çalıştır
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8080
+
+
+-----------------
+
+
+macOS'ta python yerine python3 kullanman gerekiyor. Ama PyCharm zaten .venv oluşturdu, o yüzden ayrıca venv oluşturmana gerek yok.
+
+Direkt şu adımlardan devam et:
+
+# 1. PyCharm'ın oluşturduğu venv'i aktive et
+source .venv/bin/activate
+
+# 2. .env dosyasını oluştur
+cp .env.example .env
+
+# 3. PostgreSQL başlat
+docker-compose -f extras/docker-compose-local.yml up -d postgres
+
+# 4. Uygulamayı çalıştır
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8080
+
+
+---------------------
+
+Önce venv'i aktive etmedin. Sırayla yap:
+
+source .venv/bin/activate
+
+Sonra uvicorn çalışır:
+
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8080
+
+Veya tek satırda:
+
+source .venv/bin/activate && uvicorn app.main:app --reload --host 0.0.0.0 --port 8080
+
+
+-----------------------
+
+PyCharm bağımlılıkları henüz yüklememiş olabilir. Manuel yükle:
+
+source .venv/bin/activate
+pip install -r requirements.txt
+
+Sonra tekrar dene:
+
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8080
+
+
+
