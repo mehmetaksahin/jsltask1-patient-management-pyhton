@@ -127,6 +127,31 @@
 						"description": "ETL Migration: Reads all patients from Snowflake TBL_PATIENT table, appends current timestamp to name, surname, and disease_name fields, then saves to PostgreSQL.\n\nExample transformation:\n- Input: 'William'\n- Output: 'William 2026-01-20 10:30:45'"
 					},
 					"response": []
+				},
+				{
+					"name": "Migrate from Snowflake (GET - Browser)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/patients/migrate-get",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"patients",
+								"migrate-get"
+							]
+						},
+						"description": "Same as POST /migrate but accessible via browser GET request.\n\nUseful for Snowflake trial accounts where external access (Postman) is not available.\n\nCan be triggered directly from browser URL bar."
+					},
+					"response": []
 				}
 			],
 			"description": "ETL operations between Snowflake and PostgreSQL"

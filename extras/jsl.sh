@@ -12,8 +12,14 @@ docker inspect postgres:15-alpine | grep Architecture # "Architecture": "amd64"
 docker tag postgres:15-alpine hjelvtk-ls62935.registry.snowflakecomputing.com/poc_db/public/poc_repo/postgres:15-alpine
 docker push hjelvtk-ls62935.registry.snowflakecomputing.com/poc_db/public/poc_repo/postgres:15-alpine
 
+# java imajlarını sil
+#docker rmi patient-management:latest
+#docker rmi hjelvtk-ls62935.registry.snowflakecomputing.com/poc_db/public/poc_repo/patient-management:latest
+#docker rmi patient-management-python:latest
+#docker rmi hjelvtk-ls62935.registry.snowflakecomputing.com/poc_db/public/poc_repo/patient-management-python:latest
+
 cd /Users/mehmetaksahin/memox/jsl/jslexample-first-task-python
 docker build --platform linux/amd64 -t patient-management-python:latest . # mac mini m4 işlemcili olduğu için platform belirtildi
-docker tag patient-management:latest hjelvtk-ls62935.registry.snowflakecomputing.com/poc_db/public/poc_repo/patient-management-python:latest
+docker tag patient-management-python:latest hjelvtk-ls62935.registry.snowflakecomputing.com/poc_db/public/poc_repo/patient-management-python:latest
 docker push hjelvtk-ls62935.registry.snowflakecomputing.com/poc_db/public/poc_repo/patient-management-python:latest
 

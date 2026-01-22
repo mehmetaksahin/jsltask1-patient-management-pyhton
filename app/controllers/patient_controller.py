@@ -137,6 +137,45 @@ def get_all_patients(db: Session = Depends(get_postgresql_db)):
 
 
 # =============================================================================
+# GET /api/patients/migrate-get - Tarayıcıdan migration tetikleme
+# =============================================================================
+# NOT: Bu endpoint /{patient_id}'den ÖNCE tanımlanmalı!
+# Aksi halde FastAPI "migrate-get" string'ini patient_id olarak parse etmeye çalışır.
+@router.get(
+    "/migrate-get",
+    response_model=MigrationResult,
+    summary="Migrate from Snowflake (GET)",
+    description="Same as POST /migrate but accessible via browser GET request"
+)
+def migrate_from_snowflake_get(db: Session = Depends(get_postgresql_db)):
+    """
+    Tarayıcıdan migration tetiklemek için GET endpoint.
+
+    POST /migrate ile aynı işlemi yapar, sadece GET method kullanır.
+    Trial hesaplarda Postman kullanılamadığı için tarayıcıdan erişim sağlar.
+    """
+    logger.info("GET /api/patients/migrate-get - Starting migration (browser trigger)")
+
+    result = migration_service.migrate_from_snowflake_to_postgresql(db)
+
+    if result.is_successful:
+        logger.info(f"Migration successful: {result.success_count} patients migrated")
+        return result
+    elif result.success_count > 0:
+        logger.warning(
+            f"Migration partially successful: "
+            f"{result.success_count} succeeded, {result.failure_count} failed"
+        )
+        return result
+    else:
+        logger.error(f"Migration failed: {result.message}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=result.message
+        )
+
+
+# =============================================================================
 # GET /api/patients/{id} - ID'ye göre hasta getir
 # =============================================================================
 @router.get(
